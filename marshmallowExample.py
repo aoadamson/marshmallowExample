@@ -3,11 +3,10 @@ import json
 from packaging import version
 from pprint import pprint
 
-from marshmallow import Schema, fields, INCLUDE, ValidationError
+from marshmallow import Schema, fields, INCLUDE, ValidationError, validate
 
 
 class Version(fields.Field):
-    """Version field that deserializes to a Version object."""
 
     def _deserialize(self, value, *args, **kwargs):
         try:
@@ -19,8 +18,11 @@ class Version(fields.Field):
         return str(value)
 
 
+noSpecialCharacters = r"[a-zA-Z0-9_\-]*$"
+
+
 class PackageSchema(Schema):
-    name = fields.Str(required=True)
+    name = fields.Str(required=True, validate=validate.Regexp(noSpecialCharacters))
     version = Version(required=True)
     description = fields.Str(required=True)
     main = fields.Str(required=False)
